@@ -27,7 +27,7 @@ ZXing.Net can be integrated into the project using one of the following methods:
 
 ### 1. **UnityNuGet (Recommended for demonstration)**
 
-This project assumes ZXing.Net is available through [UnityNuGet](https://github.com/bdovaz/UnityNuGet) and demonstrates its usage **as if it were already added to the NuGet registry**.
+This project assumes ZXing.Net is available through [UnityNuGet](https://github.com/bdovaz/UnityNuGet) and demonstrates its usage **as if it was already added to the NuGet registry**.
 
 You can use either:
 - `org.nuget.zxing.net` from the official registry
