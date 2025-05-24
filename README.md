@@ -35,6 +35,8 @@ You can use either:
 
 > ℹ️ If you're using a custom registry, make sure to choose the right port for the url of the scoped registry (default is 5000).
 
+> 🎉 The [merge request](https://github.com/bdovaz/UnityNuGet/pull/516) has been closed on 2025/04/17 and the package has been included in the [release 0.62.0](https://github.com/bdovaz/UnityNuGet/releases/tag/0.62.0) on 2025/05/22!
+
 ### 2. **Manual DLL Import**
 
 Alternatively, download the [prebuilt DLL](https://github.com/micjahn/ZXing.Net/blob/master/Clients/UnityDemo/Assets/zxing.unity.dll) from ZXing.Net 

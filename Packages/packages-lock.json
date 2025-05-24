@@ -269,7 +269,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.timeline": {
-      "version": "1.8.7",
+      "version": "1.8.8",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -290,7 +290,7 @@
       }
     },
     "com.unity.visualscripting": {
-      "version": "1.9.6",
+      "version": "1.9.7",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -299,12 +299,12 @@
       },
       "url": "https://packages.unity.com"
     },
-    "org.custom.zxing.net": {
+    "org.nuget.zxing.net": {
       "version": "0.16.10",
       "depth": 0,
       "source": "registry",
       "dependencies": {},
-      "url": "http://localhost:5000"
+      "url": "https://package.openupm.com"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
