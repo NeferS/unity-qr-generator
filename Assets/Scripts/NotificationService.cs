@@ -1,3 +1,5 @@
+// The notifications package only exists for Android (and the Editor), so desktop players leave this out
+#if UNITY_ANDROID || UNITY_EDITOR
 using System;
 using UnityEngine;
 using System.Collections;
@@ -138,3 +140,4 @@ public class NotificationService : MonoBehaviour
         return $"{num:N2} {suf[place]}";
     }
 }
+#endif

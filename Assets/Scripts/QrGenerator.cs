@@ -5,6 +5,7 @@ using ZXing.Common;
 using ZXing;
 using TMPro;
 using System.IO;
+using System.Runtime.InteropServices;
 
 public class QrGenerator : MonoBehaviour
 {
@@ -19,6 +20,9 @@ public class QrGenerator : MonoBehaviour
     Button _resetButton;
     [SerializeField]
     Button _downloadButton;
+    [SerializeField]
+    [Tooltip("Optional, confirms downloads on platforms without a system notification")]
+    DownloadToast _downloadToast;
 
     [Header("QR Code Settings")]
     [SerializeField]
@@ -36,7 +40,7 @@ public class QrGenerator : MonoBehaviour
             GenerateQrCode(text);
         });
 
-        // Reset and download buttons are only present in the Android UI
+        // Reset and download buttons are optional, a layout may leave them out
         if (_resetButton != null)
         {
             _resetButton.onClick.AddListener(() =>
@@ -98,15 +102,28 @@ public class QrGenerator : MonoBehaviour
         
 #if UNITY_ANDROID && !UNITY_EDITOR
         SaveToGalleryAndroid(pngData, fileName);
+#elif UNITY_WEBGL && !UNITY_EDITOR
+        // Browsers can't write files, so the page starts a download instead (Plugins/WebGL/DownloadFile.jslib)
+        DownloadFile(fileName, pngData, pngData.Length);
+        if (_downloadToast != null)
+            _downloadToast.Show("QR code downloaded");
 #else
-        // For editor testing, save to persistent data path
+        // Desktop and editor: save to the user's Downloads folder
         string downloadsPath =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+        Directory.CreateDirectory(downloadsPath);
         string filePath = Path.Combine(downloadsPath, fileName);
         File.WriteAllBytes(filePath, pngData);
         Debug.Log($"QR Code saved to: {filePath}");
+        if (_downloadToast != null)
+            _downloadToast.Show("QR code saved to Downloads\nClick to open the folder", filePath);
 #endif
     }
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+    [DllImport("__Internal")]
+    static extern void DownloadFile(string fileName, byte[] data, int length);
+#endif
 
 #if UNITY_ANDROID && !UNITY_EDITOR
     void SaveToGalleryAndroid(byte[] pngData, string fileName)
