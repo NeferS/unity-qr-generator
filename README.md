@@ -16,6 +16,7 @@ This project demonstrates the integration of ZXing.Net in Unity 6 using **[Unity
 This project requires Unity 6000.0 or newer and has been tested and confirmed to work on the following build targets:
 
 - ✅ **Windows (Standalone)**
+- ✅ **Linux**
 - ✅ **Android**
 - ✅ **WebGL**
 
