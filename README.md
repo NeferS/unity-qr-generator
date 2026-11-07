@@ -66,7 +66,6 @@ Add these under **Settings → Secrets and variables → Actions → New reposit
 
 | Secret | Value |
 |--------|-------|
-| `UNITY_LICENSE` | Contents of your Unity license file, see below |
 | `UNITY_EMAIL` | Email of your Unity account |
 | `UNITY_PASSWORD` | Password of your Unity account |
 | `ANDROID_KEYSTORE_BASE64` | The keystore file encoded in base64, see below |
@@ -74,7 +73,7 @@ Add these under **Settings → Secrets and variables → Actions → New reposit
 | `ANDROID_KEYALIAS_NAME` | Key alias, e.g. `qr-generator` |
 | `ANDROID_KEYALIAS_PASS` | Key password |
 
-**Unity license (Personal):** in Unity Hub, sign in with the account used for CI and go to **Preferences → Licenses → Add → Get a free personal license**. Then copy the whole content of `C:\ProgramData\Unity\Unity_lic.ulf` into `UNITY_LICENSE`. See the [GameCI activation guide](https://game.ci/docs/github/activation) for other systems and license types.
+**Unity license (Personal):** no license file is needed. Each build activates a Personal license with `UNITY_EMAIL` and `UNITY_PASSWORD` and returns it when the job ends. Other license types are set up differently, see the [GameCI activation guide](https://game.ci/docs/github/activation).
 
 **Android keystore:** encode the keystore and copy it to the clipboard with PowerShell:
 
