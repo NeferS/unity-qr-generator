@@ -3,7 +3,7 @@
 # - Push a tag like v1.2.0 to build and publish the release for that version.
 # - Run it manually from the Actions tab to only build and download the artifacts.
 #
-# Required repository secrets are listed in the README (section "Releases").
+# Each platform is built by build.yml. Required repository secrets are listed in the README (section "Releases").
 
 name: Release
 
@@ -41,100 +41,47 @@ jobs:
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "Version: ${VERSION}"
 
-  build:
-    name: Build ${{ matrix.name }}
+  # One job per platform instead of a matrix, so the installer only waits for the Windows build
+  build-windows:
     needs: version
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: Windows
-            targetPlatform: StandaloneWindows64
-            buildProfile: Assets/Settings/Build Profiles/Windows Profile.asset
-          - name: Linux
-            targetPlatform: StandaloneLinux64
-            buildProfile: Assets/Settings/Build Profiles/Linux Profile.asset
-          - name: Android
-            targetPlatform: Android
-            buildProfile: Assets/Settings/Build Profiles/Android Profile.asset
-    env:
-      VERSION: ${{ needs.version.outputs.version }}
-    steps:
-      # The Android image is large, the default runner doesn't have enough free space for it
-      - name: Free disk space
-        if: matrix.targetPlatform == 'Android'
-        uses: jlumbroso/free-disk-space@v1.3.1
-        with:
-          tool-cache: false
+    uses: ./.github/workflows/build.yml
+    secrets: inherit
+    with:
+      name: Windows
+      targetPlatform: StandaloneWindows64
+      buildProfile: Assets/Settings/Build Profiles/Windows Profile.asset
+      version: ${{ needs.version.outputs.version }}
 
-      # Fonts, sprites and DLLs are stored in Git LFS, without it the build gets pointer files instead
-      - uses: actions/checkout@v4
-        with:
-          lfs: true
+  build-linux:
+    needs: version
+    uses: ./.github/workflows/build.yml
+    secrets: inherit
+    with:
+      name: Linux
+      targetPlatform: StandaloneLinux64
+      buildProfile: Assets/Settings/Build Profiles/Linux Profile.asset
+      version: ${{ needs.version.outputs.version }}
 
-      - uses: actions/cache@v4
-        with:
-          path: Library
-          key: Library-${{ matrix.targetPlatform }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
-          restore-keys: |
-            Library-${{ matrix.targetPlatform }}-
-
-      - uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          targetPlatform: ${{ matrix.targetPlatform }}
-          buildProfile: ${{ matrix.buildProfile }}
-          buildName: ${{ env.APP_NAME }}
-          versioning: Custom
-          version: ${{ env.VERSION }}
-          # Only used by the Android build
-          androidExportType: androidPackage
-          androidKeystoreName: upload.jks
-          androidKeystoreBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          androidKeystorePass: ${{ secrets.ANDROID_KEYSTORE_PASS }}
-          androidKeyaliasName: ${{ secrets.ANDROID_KEYALIAS_NAME }}
-          androidKeyaliasPass: ${{ secrets.ANDROID_KEYALIAS_PASS }}
-
-      # Unity's "*_DoNotShip" and "*_ButDontShipItWithYourGame" folders are debug data, not part of the game.
-      # Uploaded artifacts lose file permissions, so the Linux build is archived first to keep it executable
-      - name: Package
-        run: |
-          BUILD_DIR="build/${{ matrix.targetPlatform }}"
-          mkdir -p dist
-          sudo rm -rf "${BUILD_DIR}"/*_DoNotShip "${BUILD_DIR}"/*_ButDontShipItWithYourGame
-          case "${{ matrix.targetPlatform }}" in
-            StandaloneWindows64)
-              cp -r "${BUILD_DIR}" "dist/${APP_NAME}-Windows"
-              ;;
-            StandaloneLinux64)
-              tar -czf "dist/${APP_NAME}-${VERSION}-Linux.tar.gz" -C "${BUILD_DIR}" .
-              ;;
-            Android)
-              cp "${BUILD_DIR}/${APP_NAME}.apk" "dist/${APP_NAME}-${VERSION}-Android.apk"
-              ;;
-          esac
-          ls -la dist
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.name }}
-          path: dist
-          if-no-files-found: error
+  build-android:
+    needs: version
+    uses: ./.github/workflows/build.yml
+    secrets: inherit
+    with:
+      name: Android
+      targetPlatform: Android
+      buildProfile: Assets/Settings/Build Profiles/Android Profile.asset
+      version: ${{ needs.version.outputs.version }}
 
   windows-installer:
     name: Package Windows
-    needs: [version, build]
+    needs: [version, build-windows]
     runs-on: windows-latest
     env:
       VERSION: ${{ needs.version.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: Windows
           path: dist
@@ -160,7 +107,7 @@ jobs:
           Compress-Archive -Path "$source\*" -DestinationPath "out\$env:APP_NAME-$env:VERSION-Windows.zip"
           Get-ChildItem out
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: Windows-Release
           path: out
@@ -169,16 +116,16 @@ jobs:
   release:
     name: Publish release
     if: github.ref_type == 'tag'
-    needs: [version, build, windows-installer]
+    needs: [version, build-linux, build-android, windows-installer]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: artifacts
           merge-multiple: true
 
       # The unpacked Windows build is also downloaded, as a folder, and isn't matched here
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           name: v${{ needs.version.outputs.version }}
           generate_release_notes: true

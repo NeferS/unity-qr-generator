@@ -1,0 +1,96 @@
+# Builds one platform with GameCI and uploads the packaged files as an artifact named after the platform.
+# Called by release.yml once per platform, so jobs can depend on a single platform's build.
+
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      name:
+        description: "Platform name, also used as the artifact name"
+        required: true
+        type: string
+      targetPlatform:
+        required: true
+        type: string
+      buildProfile:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+
+env:
+  APP_NAME: QrGenerator
+  VERSION: ${{ inputs.version }}
+
+jobs:
+  build:
+    name: Build ${{ inputs.name }}
+    runs-on: ubuntu-latest
+    # A hung Unity build would otherwise run until GitHub's 6 hour limit
+    timeout-minutes: 90
+    steps:
+      # The Android image is large, the default runner doesn't have enough free space for it
+      - name: Free disk space
+        if: inputs.targetPlatform == 'Android'
+        uses: jlumbroso/free-disk-space@v2.0.0
+        with:
+          preinstalled-runtimes: false
+
+      # Fonts, sprites and DLLs are stored in Git LFS, without it the build gets pointer files instead
+      - uses: actions/checkout@v7
+        with:
+          lfs: true
+
+      - uses: actions/cache@v6
+        with:
+          path: Library
+          key: Library-${{ inputs.targetPlatform }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-${{ inputs.targetPlatform }}-
+
+      - uses: game-ci/unity-builder@v6
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: ${{ inputs.targetPlatform }}
+          buildProfile: ${{ inputs.buildProfile }}
+          buildName: ${{ env.APP_NAME }}
+          versioning: Custom
+          version: ${{ env.VERSION }}
+          # Only used by the Android build
+          androidExportType: androidPackage
+          androidKeystoreName: upload.jks
+          androidKeystoreBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          androidKeystorePass: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+          androidKeyaliasName: ${{ secrets.ANDROID_KEYALIAS_NAME }}
+          androidKeyaliasPass: ${{ secrets.ANDROID_KEYALIAS_PASS }}
+
+      # Unity's "*_DoNotShip" and "*_ButDontShipItWithYourGame" folders are debug data, not part of the game.
+      # Uploaded artifacts lose file permissions, so the Linux build is archived first to keep it executable
+      - name: Package
+        run: |
+          BUILD_DIR="build/${{ inputs.targetPlatform }}"
+          mkdir -p dist
+          sudo rm -rf "${BUILD_DIR}"/*_DoNotShip "${BUILD_DIR}"/*_ButDontShipItWithYourGame
+          case "${{ inputs.targetPlatform }}" in
+            StandaloneWindows64)
+              cp -r "${BUILD_DIR}" "dist/${APP_NAME}-Windows"
+              ;;
+            StandaloneLinux64)
+              tar -czf "dist/${APP_NAME}-${VERSION}-Linux.tar.gz" -C "${BUILD_DIR}" .
+              ;;
+            Android)
+              cp "${BUILD_DIR}/${APP_NAME}.apk" "dist/${APP_NAME}-${VERSION}-Android.apk"
+              ;;
+          esac
+          ls -la dist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ inputs.name }}
+          path: dist
+          if-no-files-found: error

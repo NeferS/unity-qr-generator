@@ -54,7 +54,7 @@ git push origin v1.1.0
 |----------|---------------|---------------|
 | Windows | `Windows Profile` | `QrGenerator-<version>-Windows-Setup.exe` (installer), `QrGenerator-<version>-Windows.zip` (portable) |
 | Linux | `Linux Profile` | `QrGenerator-<version>-Linux.tar.gz` |
-| Android | `Android Profile` | `QrGenerator-<version>-Android.apk` |
+| Android | `Android Profile` | `QrGenerator-<version>-Android.apk` (ARM64 only) |
 
 The workflow can also be run by hand from the **Actions** tab: it builds everything and uploads the files as workflow artifacts, without publishing a release. The WebGL build is not part of the workflow.
 
