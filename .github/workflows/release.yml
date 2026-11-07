@@ -68,7 +68,10 @@ jobs:
         with:
           tool-cache: false
 
+      # Fonts, sprites and DLLs are stored in Git LFS, without it the build gets pointer files instead
       - uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - uses: actions/cache@v4
         with:
