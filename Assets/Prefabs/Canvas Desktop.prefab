@@ -24,7 +24,19 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 716316865836422797, guid: 69255913b815b2343aca089235b54097, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 962448831128775966, guid: 69255913b815b2343aca089235b54097, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1336560862278536573, guid: 69255913b815b2343aca089235b54097, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1405957452702833998, guid: 69255913b815b2343aca089235b54097, type: 3}
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 0}
@@ -133,8 +145,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2990942828878213598, guid: 69255913b815b2343aca089235b54097, type: 3}
+      propertyPath: _qrCodeWidth
+      value: 256
+      objectReference: {fileID: 0}
+    - target: {fileID: 2990942828878213598, guid: 69255913b815b2343aca089235b54097, type: 3}
       propertyPath: _resetButton
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2990942828878213598, guid: 69255913b815b2343aca089235b54097, type: 3}
+      propertyPath: _qrCodeHeight
+      value: 256
       objectReference: {fileID: 0}
     - target: {fileID: 2990942828878213598, guid: 69255913b815b2343aca089235b54097, type: 3}
       propertyPath: _downloadButton
@@ -163,6 +183,14 @@ PrefabInstance:
     - target: {fileID: 4439610879044791230, guid: 69255913b815b2343aca089235b54097, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4857862325923985950, guid: 69255913b815b2343aca089235b54097, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5263003891490469504, guid: 69255913b815b2343aca089235b54097, type: 3}
+      propertyPath: m_Material
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 6078514792970945203, guid: 69255913b815b2343aca089235b54097, type: 3}
       propertyPath: m_AnchorMax.y
@@ -194,7 +222,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6601465230531426570, guid: 69255913b815b2343aca089235b54097, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 512
+      value: 256
+      objectReference: {fileID: 0}
+    - target: {fileID: 6601465230531426570, guid: 69255913b815b2343aca089235b54097, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 256
       objectReference: {fileID: 0}
     - target: {fileID: 6601465230531426570, guid: 69255913b815b2343aca089235b54097, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -249,6 +281,10 @@ PrefabInstance:
       value: Canvas Desktop
       objectReference: {fileID: 0}
     - target: {fileID: 8738048547479203094, guid: 69255913b815b2343aca089235b54097, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8796160975347083794, guid: 69255913b815b2343aca089235b54097, type: 3}
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 0}
